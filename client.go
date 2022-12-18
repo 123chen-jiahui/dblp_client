@@ -79,6 +79,11 @@ func countDBLP(conn net.Conn, msg, address string, wg *sync.WaitGroup) {
 	statistics.mu.Lock()
 	defer statistics.mu.Unlock()
 	for k, v := range m {
+		// debug
+		// if statistics.m[k] == false {
+		// 	statistics.m[k] = true
+		// 	statistics.count += v
+		// }
 		if _, ok := statistics.m[k]; !ok { // 该chunk尚未统计
 			statistics.m[k] = true
 			statistics.count += v
@@ -144,6 +149,12 @@ func cleanStatistics() {
 	defer statistics.mu.Unlock()
 	statistics.count = 0
 	statistics.m = make(map[string]bool) // 重新申请一个map
+
+	// debug
+	// prefix := "storage/dblp_"
+	// for i := 1; i <= 117; i++ {
+	// 	statistics.m[prefix+strconv.Itoa(i)+".xml"] = false
+	// }
 }
 
 func killServer(i int) {
@@ -160,6 +171,8 @@ func killServer(i int) {
 func init() {
 	fmt.Println("正在初始化...")
 
+	// debug
+	// cleanStatistics()
 	for _, address := range ADDRESS {
 		conn := connect(address)
 		if conn != nil {
@@ -235,43 +248,4 @@ choices:
 		fmt.Println("请输入正确的选择")
 		goto choices
 	}
-	//
-	// if *a != "" && *t == "" { // 根据作者查找
-	// 	author := *a
-	// 	var wg sync.WaitGroup
-	// 	for i, conn := range connectPool {
-	// 		wg.Add(1)
-	// 		go countDBLP(conn, "0", author, addressPool[i], &wg)
-	// 	}
-	// 	wg.Wait()
-	//
-	// 	// 关闭tcp连接
-	// 	for _, conn := range connectPool {
-	// 		conn.Close()
-	// 	}
-	//
-	// 	statistics.mu.Lock()
-	//
-	// 	// debug
-	// 	// f, _ := os.OpenFile("tmp.txt", os.O_RDWR|os.O_CREATE, 0755)
-	// 	// for k, _ := range statistics.m {
-	// 	// 	f.Write([]byte(k + "\n"))
-	// 	// }
-	// 	// f.Close()
-	//
-	// 	// 输出结果
-	// 	fmt.Printf("共找到%d篇与%v有关的文章\n", statistics.count, author)
-	// 	// 共117个chunk
-	// 	fmt.Println(len(statistics.m))
-	// 	if len(statistics.m) < 117 {
-	// 		fmt.Println("注意，真实情况可能大于该结果！")
-	// 	}
-	// 	statistics.mu.Unlock()
-	// } else if *t != "" { // 根据时间查找
-	// 	// 格式[start,end]，例如[2001,2010]
-	//
-	// }
-	// if *a != "" && *t != "" {
-	//
-	// }
 }
