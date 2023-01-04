@@ -199,7 +199,10 @@ choices:
 	fmt.Println("[2]查询log")
 	fmt.Println("[3]还没做")
 	fmt.Println("[4]与随机server断开连接")
-	fmt.Println("[5]退出")
+	fmt.Println("[5]查看当前组成员")
+	fmt.Println("[6]组成员离开")
+	fmt.Println("[7]组成员重新加入")
+	fmt.Println("[8]退出")
 	fmt.Print("输入选择：")
 
 	var choice int
@@ -239,6 +242,30 @@ choices:
 		killServer(rand.Intn(len(AddressPool)))
 		goto choices
 	case 5:
+		data := make([]byte, 1024)
+		conn := ConnectPool[0]
+		conn.Write([]byte("2"))
+		n, _ := conn.Read(data)
+		fmt.Println("当前组成员列表为：")
+		fmt.Println(string(data[:n]))
+		goto choices
+	case 6:
+		fmt.Println("输入要离开的组成员地址，以ip:port的形式输入，例如127.0.0.1:20001：")
+		var addr string
+		fmt.Scanln(&addr)
+		msg := "3;" + addr
+		conn := ConnectPool[0]
+		conn.Write([]byte(msg))
+		goto choices
+	case 7:
+		fmt.Println("输入重新加入的组成员地址，以ip:port的形式输入，例如127.0.0.1:20001：")
+		var addr string
+		fmt.Scanln(&addr)
+		msg := "4;" + addr
+		conn := ConnectPool[0]
+		conn.Write([]byte(msg))
+		goto choices
+	case 8:
 		// 关闭tcp连接
 		for _, conn := range ConnectPool {
 			conn.Close()
